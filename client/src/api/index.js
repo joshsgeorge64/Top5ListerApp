@@ -29,11 +29,11 @@ export const updateTop5ListById = (id, payload) => api.put(`/top5list/${id}`, pa
 export const deleteTop5ListById = (id) => api.delete(`/top5list/${id}`)
 export const getTop5ListById = (id) => api.get(`/top5list/${id}`)
 
-export const getLoggedIn = () => api.get(`/loggedIn/`);
+export const getLoggedIn = () => api.get(`/loggedIn/`).catch((err) => 
+    {if(err.response) return err.response; else return null});
 export const registerUser = (payload) => api.post(`/register/`, payload)
 export const loginUser = (payload) => api.post(`/login/`, payload)
 export const logoutUser = () => api.get(`/logout/`)
-
 const apis = {
     createTop5List,
     getAllTop5Lists,

@@ -4,16 +4,31 @@ const bcrypt = require('bcryptjs')
 
 getLoggedIn = async (req, res) => {
     auth.verify(req, res, async function () {
+        console.log(req.userId)
         const loggedInUser = await User.findOne({ _id: req.userId });
-        return res.status(200).json({
-            loggedIn: true,
-            user: {
-                firstName: loggedInUser.firstName,
-                lastName: loggedInUser.lastName,
-                email: loggedInUser.email
-            }
-        }).send();
-    })
+        try {
+            return res.status(200).json({
+                loggedIn: true,
+                user: {
+                    firstName: loggedInUser.firstName,
+                    lastName: loggedInUser.lastName,
+                    email: loggedInUser.email
+                }
+            }).send();
+        } catch (err) {
+            console.error(err);
+            res.status(500).send();
+        }
+    });
+}
+
+logout = async (req, res) => {
+    try {
+        res.clearCookie("token").status(200).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
 }
 
 registerUser = async (req, res) => {
@@ -78,7 +93,48 @@ registerUser = async (req, res) => {
     }
 }
 
+loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        User.findOne({ email }).then(user => {
+            if(!user) if (!user) return res.status(400).json({ msg: "Invalid Credentials" });
+            if(bcrypt.compareSync(password, user.passwordHash)) {
+                const firstName = user.firstName;
+                const lastName = user.lastName;
+                const token = auth.signToken(user);
+                return res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "none"
+                }).status(200).json({
+                    success: true,
+                    user: {
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email
+                    }
+                });
+            } else {
+                return res.status(401).json({ msg: "Invalid credential" });
+            }
+            
+        });
+        //const checkPass = bcrypt.compareSync(password, passwordHash);
+        //await res.cookie("testCookie", "user exists").status(200).send();
+        // if (user) {
+            
+        // } else {
+            
+        // }
+    } catch (err) {
+        console.log("login failed");
+    }
+}
+
 module.exports = {
     getLoggedIn,
-    registerUser
+    registerUser,
+    logout,
+    loginUser
 }
