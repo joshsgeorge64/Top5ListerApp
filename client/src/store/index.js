@@ -335,6 +335,7 @@ function GlobalStoreContextProvider(props) {
         let oldText = store.currentList.items[index];
         let transaction = new UpdateItem_Transaction(store, index, oldText, newText);
         tps.addTransaction(transaction);
+        console.log("item updated");
     }
 
     store.moveItem = function (start, end) {
@@ -365,6 +366,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.updateCurrentList = async function () {
+        console.log(store.currentList._id);
         const response = await api.updateTop5ListById(store.currentList._id, store.currentList);
         if (response.data.success) {
             storeReducer({
