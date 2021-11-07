@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../auth';
 import { GlobalStoreContext } from '../store';
 import Avatar from '@mui/material/Avatar';
@@ -15,6 +15,20 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Modal from '@mui/material/Modal';
+//import ErrorModal from './ErrorModal'
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
 function Copyright(props) {
     return (
@@ -48,11 +62,32 @@ export default function LoginScreen() {
             email: formData.get('email'),
             password: formData.get('password'),
         });
-        
+
     };
+
+    const toggleClose = (event) => {
+        auth.hideErrorModal();
+    }
 
     return (
         <ThemeProvider theme={theme}>
+            <div>
+                <Modal
+                    open={auth.showModal}
+                    onClose={toggleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Text in a modal
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                        </Typography>
+                    </Box>
+                </Modal>
+            </div>
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
                 <Grid

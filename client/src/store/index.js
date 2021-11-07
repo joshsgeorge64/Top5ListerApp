@@ -26,7 +26,8 @@ export const GlobalStoreActionType = {
     UNMARK_LIST_FOR_DELETION: "UNMARK_LIST_FOR_DELETION",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE"
+    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    SHOW_MODAL: "SHOW_MODAL"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -42,7 +43,8 @@ function GlobalStoreContextProvider(props) {
         newListCounter: 0,
         listNameActive: false,
         itemActive: false,
-        listMarkedForDeletion: null
+        listMarkedForDeletion: null,
+        showErrorModal: false
     });
     const history = useHistory();
 
@@ -153,6 +155,17 @@ function GlobalStoreContextProvider(props) {
                     listMarkedForDeletion: null
                 });
             }
+            case GlobalStoreActionType.SHOW_MODAL: {
+                return setStore({
+                    idNamePairs: [],
+                    currentList: null,
+                    newListCounter: 0,
+                    listNameActive: false,
+                    itemActive: false,
+                    listMarkedForDeletion: null,
+                    showErrorModal: payload
+                })
+            }
             default:
                 return store;
         }
@@ -191,13 +204,27 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.showModal = function () {
+        storeReducer({
+            type: GlobalStoreActionType.SHOW_MODAL,
+            payload: true
+        });
+    }
+
+    store.hideModal = function () {
+        storeReducer({
+            type: GlobalStoreActionType.SHOW_MODAL,
+            payload: false
+        });
+    }
+
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
         storeReducer({
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {}
         });
-        
+
         tps.clearAllTransactions();
         history.push("/");
     }
@@ -205,6 +232,7 @@ function GlobalStoreContextProvider(props) {
     // THIS FUNCTION CREATES A NEW LIST
     store.createNewList = async function () {
         let newListName = "Untitled" + store.newListCounter;
+        console.log(auth.user);
         let payload = {
             name: newListName,
             items: ["?", "?", "?", "?", "?"],
@@ -230,7 +258,7 @@ function GlobalStoreContextProvider(props) {
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = async function () {
-        const response = await api.getTop5ListPairs();
+        const response = await api.getTop5ListPairs({email: auth.user.email});
         if (response.data.success) {
             let pairsArray = response.data.idNamePairs;
             storeReducer({
@@ -354,11 +382,11 @@ function GlobalStoreContextProvider(props) {
         tps.doTransaction();
     }
 
-    store.canUndo = function() {
+    store.canUndo = function () {
         return tps.hasTransactionToUndo();
     }
 
-    store.canRedo = function() {
+    store.canRedo = function () {
         return tps.hasTransactionToRedo();
     }
 

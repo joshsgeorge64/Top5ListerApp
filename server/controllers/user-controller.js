@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs')
 
 getLoggedIn = async (req, res) => {
     auth.verify(req, res, async function () {
-        console.log(req.userId)
         const loggedInUser = await User.findOne({ _id: req.userId });
         try {
             return res.status(200).json({
@@ -14,8 +13,9 @@ getLoggedIn = async (req, res) => {
                     lastName: loggedInUser.lastName,
                     email: loggedInUser.email
                 }
-            }).send();
+            });
         } catch (err) {
+            console.log("Error:")
             console.error(err);
             res.status(500).send();
         }
@@ -98,7 +98,7 @@ loginUser = async (req, res) => {
         const { email, password } = req.body;
         
         User.findOne({ email }).then(user => {
-            if(!user) if (!user) return res.status(400).json({ msg: "Invalid Credentials" });
+            if(!user) if (!user) return res.status(401).json({ msg: "Invalid Credentials" });
             if(bcrypt.compareSync(password, user.passwordHash)) {
                 const firstName = user.firstName;
                 const lastName = user.lastName;

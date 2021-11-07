@@ -16,6 +16,7 @@ const api = axios.create({
     baseURL: 'http://localhost:4000/api',
 })
 
+
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A
 // REQUEST METHOD (like get) AND PATH (like /top5list). SOME ALSO
 // REQUIRE AN id SO THAT THE SERVER KNOWS ON WHICH LIST TO DO ITS
@@ -29,11 +30,18 @@ export const updateTop5ListById = (id, payload) => api.put(`/top5list/${id}`, pa
 export const deleteTop5ListById = (id) => api.delete(`/top5list/${id}`)
 export const getTop5ListById = (id) => api.get(`/top5list/${id}`)
 
-export const getLoggedIn = () => api.get(`/loggedIn/`).catch((err) => 
-    {if(err.response) return err.response; else return null});
+export const getLoggedIn = () => api.get(`/loggedIn/`).catch((err) => { if (err.response) return err.response; else return null });
 export const registerUser = (payload) => api.post(`/register/`, payload)
-export const loginUser = (payload) => api.post(`/login/`, payload)
-export const logoutUser = () => api.get(`/logout/`)
+export const loginUser = (payload) => api.post(`/login/`, payload).catch((err) => {
+    if (err.response) {
+        return err.response;
+    } else return null
+});
+export const logoutUser = () => api.get(`/logout/`).catch((err) => {
+    if(err.response) {
+        return err.response
+    } else return null;
+});
 const apis = {
     createTop5List,
     getAllTop5Lists,

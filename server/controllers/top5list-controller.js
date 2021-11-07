@@ -1,4 +1,5 @@
 const Top5List = require('../models/top5list-model');
+const User = require('../models/user-model');
 
 createTop5List = (req, res) => {
     const body = req.body;
@@ -9,6 +10,7 @@ createTop5List = (req, res) => {
         })
     }
 
+    console.log(body);
     const top5List = new Top5List(body);
     console.log("creating top5List: " + JSON.stringify(top5List));
     if (!top5List) {
@@ -35,6 +37,11 @@ createTop5List = (req, res) => {
 updateTop5List = async (req, res) => {
     const body = req.body
     console.log("updateTop5List: " + JSON.stringify(body));
+    let email = 0;
+    console.log(req.userId);
+    await User.findById(req.userId, (err, user) => {
+        email = user.email;
+    }).catch(err => console.log(err))
     if (!body) {
         return res.status(400).json({
             success: false,
@@ -44,6 +51,16 @@ updateTop5List = async (req, res) => {
 
     Top5List.findOne({ _id: req.params.id }, (err, top5List) => {
         console.log("top5List found: " + JSON.stringify(top5List));
+        console.log("Email: " + email);
+        console.log("List owner: " + top5List.ownerEmail);
+        if(top5List.ownerEmail != email) {
+            console.log("Unauthorized edit attempt");
+            return res.status(401).json({
+                err,
+                message: 'Unauthorized edit attempt!',
+            })
+        }
+
         if (err) {
             return res.status(404).json({
                 err,
@@ -109,7 +126,13 @@ getTop5Lists = async (req, res) => {
     }).catch(err => console.log(err))
 }
 getTop5ListPairs = async (req, res) => {
-    await Top5List.find({ }, (err, top5Lists) => {
+    let email = 0;
+    console.log(req.userId);
+    await User.findById(req.userId, (err, user) => {
+        email = user.email;
+    }).catch(err => console.log(err))
+    console.log(email);
+    await Top5List.find({ ownerEmail: email }, (err, top5Lists) => {
         if (err) {
             return res.status(400).json({ success: false, error: err })
         }
@@ -130,9 +153,11 @@ getTop5ListPairs = async (req, res) => {
                 };
                 pairs.push(pair);
             }
+
             return res.status(200).json({ success: true, idNamePairs: pairs })
         }
     }).catch(err => console.log(err))
+
 }
 
 module.exports = {
