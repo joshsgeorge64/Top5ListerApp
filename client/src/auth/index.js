@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom'
 import api from '../api'
 
+
 const AuthContext = createContext();
 console.log("create AuthContext: " + AuthContext);
 
@@ -86,6 +87,7 @@ function AuthContextProvider(props) {
     auth.login = async function (userData, store) {
         const response = await api.loginUser(userData);
         console.log(response.status);
+        
         if (response.status === 200) {
             authReducer({
                 type: AuthActionType.LOGIN,
@@ -102,6 +104,7 @@ function AuthContextProvider(props) {
                 type: AuthActionType.SHOW_MODAL,
                 payload: true
             })
+            console.log("failed login")
         }
     }
 

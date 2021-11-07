@@ -16,6 +16,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Modal from '@mui/material/Modal';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 //import ErrorModal from './ErrorModal'
 
 const style = {
@@ -74,18 +76,19 @@ export default function LoginScreen() {
             <div>
                 <Modal
                     open={auth.showModal}
-                    onClose={toggleClose}
+                    
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
                     <Box sx={style}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Text in a modal
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                        </Typography>
-                    </Box>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Error
+                    </Typography>
+                    <Stack sx={{ width: '100%' }} spacing={2}>
+                        <Alert severity="error">Unsuccessful Login: please enter correct login information</Alert>
+                        <Button onClick={toggleClose}>OK</Button>
+                    </Stack>
+                </Box>
                 </Modal>
             </div>
             <Grid container component="main" sx={{ height: '100vh' }}>
