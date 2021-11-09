@@ -24,21 +24,17 @@ const api = axios.create({
 // WE NEED TO PUT THINGS INTO THE DATABASE OR IF WE HAVE SOME
 // CUSTOM FILTERS FOR QUERIES
 export const createTop5List = (payload) => api.post(`/top5list/`, payload).catch((err) => { if (err.response) return err.response; else return null });
-export const getAllTop5Lists = () => api.get(`/top5lists/`)
+export const getAllTop5Lists = () => api.get(`/top5lists/`).catch((err) => { if (err.response) return err.response; else return null });
 export const getTop5ListPairs = () => api.get(`/top5listpairs/`).catch((err) => { if (err.response) return err.response; else return null });
 export const updateTop5ListById = (id, payload) => api.put(`/top5list/${id}`, payload).catch((err) => { if (err.response) return err.response; else return null });
 export const deleteTop5ListById = (id) => api.delete(`/top5list/${id}`).catch((err) => { if (err.response) return err.response; else return null });
 export const getTop5ListById = (id) => api.get(`/top5list/${id}`).catch((err) => { if (err.response) return err.response; else return null });
 
 export const getLoggedIn = () => api.get(`/loggedIn/`).catch((err) => { if (err.response) return err.response; else return null });
-export const registerUser = (payload) => api.post(`/register/`, payload)
-export const loginUser = (payload) => api.post(`/login/`, payload).catch((err) => {
-    if (err.response) {
-        return err.response;
-    } else return null
-});
+export const registerUser = (payload) => api.post(`/register/`, payload).catch((err) => { if (err.response) return err.response; else return null });
+export const loginUser = (payload) => api.post(`/login/`, payload).catch((err) => { if (err.response) { return err.response; } else return null });
 export const logoutUser = () => api.get(`/logout/`).catch((err) => {
-    if(err.response) {
+    if (err.response) {
         return err.response
     } else return null;
 });

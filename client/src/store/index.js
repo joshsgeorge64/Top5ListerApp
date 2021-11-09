@@ -27,7 +27,8 @@ export const GlobalStoreActionType = {
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
-    SHOW_MODAL: "SHOW_MODAL"
+    SHOW_MODAL: "SHOW_MODAL",
+    DELETE_LIST: "DELETE_LIST"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -44,7 +45,7 @@ function GlobalStoreContextProvider(props) {
         listNameActive: false,
         itemActive: false,
         listMarkedForDeletion: null,
-        showErrorModal: false
+        showDeleteModal: false
     });
     const history = useHistory();
 
@@ -163,7 +164,7 @@ function GlobalStoreContextProvider(props) {
                     listNameActive: false,
                     itemActive: false,
                     listMarkedForDeletion: null,
-                    showErrorModal: payload
+                    showDeleteModal: payload
                 })
             }
             default:
@@ -305,6 +306,7 @@ function GlobalStoreContextProvider(props) {
             payload: null
         });
     }
+
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
     // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE

@@ -128,10 +128,18 @@ function AuthContextProvider(props) {
                 }
             });
         }
+        
     }
 
     auth.registerUser = async function (userData, store) {
         const response = await api.registerUser(userData);
+        if (response.status === 400) {
+            authReducer({
+                type: AuthActionType.SHOW_MODAL,
+                payload: true
+            })
+            console.log("failed register")
+        }
         if (response.status === 200) {
             authReducer({
                 type: AuthActionType.REGISTER_USER,

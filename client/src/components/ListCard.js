@@ -6,6 +6,22 @@ import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
 
 /*
     This is a card in our list of top 5 lists. It lets select
@@ -18,11 +34,14 @@ function ListCard(props) {
     const { store } = useContext(GlobalStoreContext);
     const [editActive, setEditActive] = useState(false);
     const [text, setText] = useState("");
+    const [showDelete, setShowDelete] = useState(false);
+    const [disableList, setDisableList] = useState(false);
     const { idNamePair } = props;
 
     function handleLoadList(event, id) {
         if (!event.target.disabled) {
             // CHANGE THE CURRENT LIST
+            console.log("loading list:" + id);
             store.setCurrentList(id);
         }
     }
@@ -43,6 +62,8 @@ function ListCard(props) {
     async function handleDeleteList(event, id) {
         event.stopPropagation();
         store.markListForDeletion(id);
+        setDisableList(true);
+        setShowDelete(true);
     }
 
     function handleKeyPress(event) {
@@ -56,8 +77,24 @@ function ListCard(props) {
         setText(event.target.value);
     }
 
+    const handleClose = () => {
+        setShowDelete(false);
+    }
+
+    function confirmDelete() {
+        store.deleteMarkedList();
+        store.unmarkListForDeletion();
+    }
+
+    function cancelDelete() {
+        handleClose();
+        setDisableList(false);
+        store.unmarkListForDeletion();
+    }
+
     let cardElement =
         <ListItem
+            disabled={disableList}
             id={idNamePair._id}
             key={idNamePair._id}
             sx={{ marginTop: '15px', display: 'flex', p: 1 }}
@@ -71,19 +108,19 @@ function ListCard(props) {
                 width: '100%'
             }}
         >
-                <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
-                <Box sx={{ p: 1 }}>
-                    <IconButton onClick={handleToggleEdit} aria-label='edit'>
-                        <EditIcon style={{fontSize:'48pt'}} />
-                    </IconButton>
-                </Box>
-                <Box sx={{ p: 1 }}>
-                    <IconButton onClick={(event) => {
-                        handleDeleteList(event, idNamePair._id)
-                    }} aria-label='delete'>
-                        <DeleteIcon style={{fontSize:'48pt'}} />
-                    </IconButton>
-                </Box>
+            <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
+            <Box sx={{ p: 1 }}>
+                <IconButton onClick={handleToggleEdit} aria-label='edit'>
+                    <EditIcon style={{ fontSize: '48pt' }} />
+                </IconButton>
+            </Box>
+            <Box sx={{ p: 1 }}>
+                <IconButton onClick={(event) => {
+                    handleDeleteList(event, idNamePair._id)
+                }} aria-label='delete'>
+                    <DeleteIcon style={{ fontSize: '48pt' }} />
+                </IconButton>
+            </Box>
         </ListItem>
 
     if (editActive) {
@@ -100,13 +137,28 @@ function ListCard(props) {
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
                 defaultValue={idNamePair.name}
-                inputProps={{style: {fontSize: 48}}}
-                InputLabelProps={{style: {fontSize: 24}}}
+                inputProps={{ style: { fontSize: 48 } }}
+                InputLabelProps={{ style: { fontSize: 24 } }}
                 autoFocus
             />
     }
-    return (
-        cardElement
+    return (<div>
+        <Modal
+            open={showDelete}
+            
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                    Confirm Deletion 
+                </Typography>
+                <Button onClick={confirmDelete}>Confirm</Button>
+                <Button onClick={cancelDelete}>Cancel</Button>
+            </Box>
+        </Modal>
+        {cardElement}
+    </div>
     );
 }
 
